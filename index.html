@@ -138,7 +138,7 @@ function connect(){
   if(es){es.close();es=null}
   tree={};lastIngest=0;
   if(!S.dbUrl){notice('Bitte in den Einstellungen die Datenbank-URL eintragen.');return}
-  if(!S.path){notice('Der Pfad der Fahrzeuge ist noch nicht gesetzt. Öffne die <b>Einstellungen</b> und klicke bei „Pfad" auf <b>Suchen</b>.');setConn(false,'kein Pfad');return}
+  if(!S.path){notice('Der Pfad der Fahrzeuge ist noch nicht gesetzt. Öffne die <b>Einstellungen</b> und klicke bei „Pfad" auf <b>Suchen</b>. Wird der Zugriff nicht angenommen, versuche <i>livegeomatching/busses/<i/>');setConn(false,'kein Pfad');return}
   const url=S.dbUrl.replace(/\/$/,'')+'/'+S.path.replace(/^\/|\/$/g,'')+'.json';
   setConn(false,'verbinde …');
   es=new EventSource(url);
