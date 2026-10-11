@@ -1,0 +1,374 @@
+{
+  "format": "betriebshofliste-straenge/1",
+  "betriebshof": "Rheinstraße",
+  "einstellungen": {
+    "richtung": "SW",
+    "reihenlaengeM": 50,
+    "toleranzQuerM": 2,
+    "radiusEinzelpunktM": 15,
+    "radiusHofM": 250
+  },
+  "straenge": [
+    {
+      "strang": "1",
+      "lat": 51.184033,
+      "lon": 6.450856
+    },
+    {
+      "strang": "2",
+      "lat": 51.184486,
+      "lon": 6.452031
+    },
+    {
+      "strang": "3",
+      "lat": 51.184533,
+      "lon": 6.451956
+    },
+    {
+      "strang": "5",
+      "lat": 51.18458,
+      "lon": 6.45181
+    },
+    {
+      "strang": "5",
+      "lat": 51.18458,
+      "lon": 6.45176
+    },
+    {
+      "strang": "5",
+      "lat": 51.18432,
+      "lon": 6.45129
+    },
+    {
+      "strang": "5",
+      "lat": 51.18464,
+      "lon": 6.45206
+    },
+    {
+      "strang": "6",
+      "lat": 51.18423,
+      "lon": 6.45086
+    },
+    {
+      "strang": "7",
+      "lat": 51.18454,
+      "lon": 6.45157
+    },
+    {
+      "strang": "9",
+      "lat": 51.18447,
+      "lon": 6.45103
+    },
+    {
+      "strang": "10",
+      "lat": 51.184772,
+      "lon": 6.451822
+    },
+    {
+      "strang": "10",
+      "lat": 51.1844,
+      "lon": 6.45128
+    },
+    {
+      "strang": "11",
+      "lat": 51.18482,
+      "lon": 6.45184
+    },
+    {
+      "strang": "13",
+      "lat": 51.184815,
+      "lon": 6.451647
+    },
+    {
+      "strang": "13",
+      "lat": 51.18475,
+      "lon": 6.45143
+    },
+    {
+      "strang": "14",
+      "lat": 51.1845,
+      "lon": 6.45069
+    },
+    {
+      "strang": "14",
+      "lat": 51.18443,
+      "lon": 6.45045
+    },
+    {
+      "strang": "15",
+      "lat": 51.18462,
+      "lon": 6.45109
+    },
+    {
+      "strang": "16",
+      "lat": 51.184932,
+      "lon": 6.451604
+    },
+    {
+      "strang": "16",
+      "lat": 51.18481,
+      "lon": 6.4513
+    },
+    {
+      "strang": "16",
+      "lat": 51.18463,
+      "lon": 6.45085
+    },
+    {
+      "strang": "18",
+      "lat": 51.18388,
+      "lon": 6.450556
+    },
+    {
+      "strang": "18",
+      "lat": 51.18366,
+      "lon": 6.44997
+    },
+    {
+      "strang": "19",
+      "lat": 51.183902,
+      "lon": 6.450533
+    },
+    {
+      "strang": "20",
+      "lat": 51.183935,
+      "lon": 6.450496
+    },
+    {
+      "strang": "21",
+      "lat": 51.183963,
+      "lon": 6.450465
+    },
+    {
+      "strang": "22",
+      "lat": 51.184001,
+      "lon": 6.450433
+    },
+    {
+      "strang": "23",
+      "lat": 51.184022,
+      "lon": 6.450415
+    },
+    {
+      "strang": "24",
+      "lat": 51.184056,
+      "lon": 6.450378
+    },
+    {
+      "strang": "25",
+      "lat": 51.184086,
+      "lon": 6.450358
+    },
+    {
+      "strang": "26",
+      "lat": 51.184125,
+      "lon": 6.450318
+    },
+    {
+      "strang": "27",
+      "lat": 51.18415,
+      "lon": 6.450304
+    },
+    {
+      "strang": "28",
+      "lat": 51.184184,
+      "lon": 6.45026
+    },
+    {
+      "strang": "29",
+      "lat": 51.184219,
+      "lon": 6.450236
+    },
+    {
+      "strang": "29",
+      "lat": 51.18389,
+      "lon": 6.44933
+    },
+    {
+      "strang": "30",
+      "lat": 51.184277,
+      "lon": 6.450187
+    },
+    {
+      "strang": "31",
+      "lat": 51.184304,
+      "lon": 6.450151
+    },
+    {
+      "strang": "32",
+      "lat": 51.184342,
+      "lon": 6.450111
+    },
+    {
+      "strang": "33",
+      "lat": 51.184372,
+      "lon": 6.450091
+    },
+    {
+      "strang": "34",
+      "lat": 51.184401,
+      "lon": 6.450057
+    },
+    {
+      "strang": "35",
+      "lat": 51.184113,
+      "lon": 6.449165
+    },
+    {
+      "strang": "36",
+      "lat": 51.184138,
+      "lon": 6.44915
+    },
+    {
+      "strang": "36/Waschplatz",
+      "lat": 51.184138,
+      "lon": 6.44915
+    },
+    {
+      "strang": "ABC",
+      "lat": 51.184093,
+      "lon": 6.451131
+    },
+    {
+      "strang": "Waschstraße",
+      "lat": 51.184607,
+      "lon": 6.4498481
+    },
+    {
+      "strang": "Waschstraße",
+      "lat": 51.18457,
+      "lon": 6.449948
+    },
+    {
+      "strang": "Laden Hofstra",
+      "lat": 51.18502,
+      "lon": 6.44895
+    },
+    {
+      "strang": "Laden Hofstra",
+      "lat": 51.18508,
+      "lon": 6.44909
+    },
+    {
+      "strang": "Laden Hofstra",
+      "lat": 51.185123,
+      "lon": 6.449214
+    },
+    {
+      "strang": "Inspektion/Blech",
+      "lat": 51.184954,
+      "lon": 6.450067
+    },
+    {
+      "strang": "Inspektion/Blech",
+      "lat": 51.184992,
+      "lon": 6.450024
+    },
+    {
+      "strang": "Inspektion/Blech",
+      "lat": 51.18504,
+      "lon": 6.449973
+    },
+    {
+      "strang": "Inspektion/Blech",
+      "lat": 51.18488,
+      "lon": 6.45002
+    },
+    {
+      "strang": "Hof/Ausfahrt/Res.",
+      "lat": 51.184322,
+      "lon": 6.452019
+    },
+    {
+      "strang": "bewegt sich auf dem Btf.",
+      "lat": 51.184924,
+      "lon": 6.449767
+    },
+    {
+      "strang": "bewegt sich auf dem Btf.",
+      "lat": 51.183557,
+      "lon": 6.449915
+    },
+    {
+      "strang": "bewegt sich auf dem Btf.",
+      "lat": 51.184015,
+      "lon": 6.450664
+    },
+    {
+      "strang": "bewegt sich auf dem Btf.",
+      "lat": 51.185091,
+      "lon": 6.448824
+    },
+    {
+      "strang": "fährt rein/raus",
+      "lat": 51.183938,
+      "lon": 6.452679
+    },
+    {
+      "strang": "Viersen Seite Generatorenhalle",
+      "lat": 51.260906,
+      "lon": 6.389337
+    },
+    {
+      "strang": "Viersen FR Ausfahrt",
+      "lat": 51.26138,
+      "lon": 6.38935
+    },
+    {
+      "strang": "Viersen FR Ausfahrt",
+      "lat": 51.26138,
+      "lon": 6.38935
+    },
+    {
+      "strang": "Viersen Seite Generatorenhalle",
+      "lat": 51.261168,
+      "lon": 6.389416
+    },
+    {
+      "strang": "22",
+      "lat": 51.18366,
+      "lon": 6.4496
+    },
+    {
+      "strang": "ABC",
+      "lat": 51.18397,
+      "lon": 6.45151
+    },
+    {
+      "strang": "ABC",
+      "lat": 51.18409,
+      "lon": 6.45136
+    },
+    {
+      "strang": "KFZB",
+      "lat": 51.1847,
+      "lon": 6.44959
+    },
+    {
+      "strang": "KFZB",
+      "lat": 51.184837,
+      "lon": 6.449638
+    },
+    {
+      "strang": "Laden BYD",
+      "lat": 51.18481,
+      "lon": 6.45235
+    },
+    {
+      "strang": "Laden BYD",
+      "lat": 51.18494,
+      "lon": 6.45251
+    },
+    {
+      "strang": "Laden MB",
+      "lat": 51.18452,
+      "lon": 6.44851
+    },
+    {
+      "strang": "Laden Werkstatt 80er",
+      "lat": 51.18445,
+      "lon": 6.44888
+    }
+  ],
+  "gespeichert": "2026-10-11T21:21:20.488Z"
+}
