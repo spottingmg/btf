@@ -34,7 +34,7 @@ tr:last-child td{border-bottom:0}
 tbody tr:hover{background:color-mix(in srgb,var(--acc) 6%,transparent)}
 .n{font-weight:700;font-variant-numeric:tabular-nums}
 .tag{display:inline-block;padding:.05rem .5rem;border-radius:99px;font-size:.78rem;font-weight:600;border:1px solid currentColor}
-.fahrt{color:var(--ok)}.hof{color:var(--acc)}.off{color:var(--warn)}
+.miss{color:var(--mut)}.fahrt{color:var(--ok)}.hof{color:var(--acc)}.off{color:var(--warn)}
 .mut{color:var(--mut)}
 .msg{padding:1rem;border:1px dashed var(--line);border-radius:10px;margin-bottom:.8rem;background:var(--card)}
 .msg.err{border-color:var(--bad)}
@@ -45,7 +45,33 @@ label{display:block;margin:.6rem 0 .2rem;font-size:.8rem;color:var(--mut)}
 dialog input,dialog select,dialog textarea{width:100%}
 pre{white-space:pre-wrap;word-break:break-all;font-size:.78rem;background:var(--bg);padding:.6rem;border-radius:8px;max-height:45vh;overflow:auto}
 .row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;justify-content:flex-end}
-@media (max-width:640px){th:nth-child(8),th:nth-child(9),td:nth-child(8),td:nth-child(9){display:none}}
+@media (max-width:700px){
+  body{font-size:16px}
+  header{position:static;padding:.6rem .75rem}
+  header .sp{display:none}
+  header button{flex:1 1 auto;padding:.4rem .5rem;font-size:.85rem}
+  main{padding:.6rem .6rem 2rem}
+  .bar button{flex:1 1 auto;padding:.5rem .4rem}
+  .bar input{flex:1 1 100%;padding:.55rem .7rem}
+  .box{border:0;background:transparent;overflow:visible}
+  table,tbody{display:block}
+  thead{display:none}
+  tbody tr{display:grid;grid-template-columns:auto 1fr auto;gap:.15rem .7rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.65rem .8rem;margin-bottom:.55rem}
+  td{display:block;border:0;padding:0;white-space:normal;min-width:0!important;max-width:none!important}
+  td:nth-child(1){grid-column:1;grid-row:1;font-size:1.25rem}
+  td:nth-child(2){grid-column:2;grid-row:1;font-size:1.25rem;color:var(--acc)}
+  td:nth-child(5){grid-column:3;grid-row:1;text-align:right}
+  td:nth-child(3),td:nth-child(4){grid-column:1/-1;display:inline}
+  td:nth-child(3){grid-row:2}td:nth-child(4){grid-row:2;justify-self:end}
+  td:nth-child(3):not(:empty)::before{content:"Kurs ";color:var(--mut);font-size:.8rem}
+  td:nth-child(4):not(:empty)::before{content:"Dienst ";color:var(--mut);font-size:.8rem}
+  td:nth-child(6){grid-column:1/-1;grid-row:3;font-weight:600;margin-top:.25rem}
+  td:nth-child(7){grid-column:1/-1;grid-row:4}
+  td:nth-child(8){grid-column:1/-1;grid-row:5}
+  td:nth-child(9){grid-column:1/3;grid-row:6;font-size:.82rem}
+  td:nth-child(10){grid-column:3;grid-row:6;text-align:right;font-size:.9rem}
+  td:nth-child(10) a{display:inline-block;padding:.3rem .2rem .3rem .7rem}
+}
 </style>
 </head>
 <body>
@@ -59,6 +85,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:.78rem;background:var(--
   <button id="bLoad" title="Stränge aus einer JSON-Datei laden">Stränge laden</button>
   <input type="file" id="fLoad" accept=".json,application/json" hidden>
   <button id="bNow" title="Daten jetzt übernehmen">Jetzt aktualisieren</button>
+  <button id="bSeek" title="Gesamte Datenbank unter dem Pfad nach einer Nummer durchsuchen">Sucher</button>
   <button id="bSet">Einstellungen</button>
 </header>
 <main>
@@ -68,6 +95,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:.78rem;background:var(--
     <button data-f="fahrt">Unterwegs</button>
     <button data-f="hof">Im Betriebshof</button>
     <button data-f="off">Kein Signal</button>
+    <button data-f="miss">Nicht in Schnittstelle</button>
     <input id="q" type="search" placeholder="Wagen, Linie, Kurs, Dienst, Strang …">
     <span class="mut" id="cnt"></span>
   </div>
@@ -87,6 +115,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:.78rem;background:var(--
   <h3 style="margin-top:0">Einstellungen</h3>
   <label>Feld für Letzter Halt (optional – sonst wird er aus dem Wechsel des nächsten Halts abgeleitet)</label><select id="sStop"></select>
   <label>Karte öffnen mit</label><select id="sMap"><option value="google">Google Maps</option><option value="osm">OpenStreetMap</option><option value="custom">Eigene URL (z. B. Livekarte)</option></select>
+  <label>Verlauf-Datei vom Sammler (leer = ohne Verlauf)</label><input id="sHist" placeholder="https://raw.githubusercontent.com/…/fahrzeuge.json">
   <label>Eigene Karten-URL – {lat} und {lon} werden ersetzt</label><input id="sMapTpl" placeholder="https://…?lat={lat}&amp;lon={lon}">
   <label>Aktualisierung der Liste (Sekunden)</label><input id="sEvery" type="number" min="5" max="3600">
   <label>Datenbank-URL</label><input id="sUrl">
@@ -100,6 +129,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:.78rem;background:var(--
   <label>In welche Richtung verlaufen die Reihen ab den Messpunkten?</label>
   <select id="sSide"><option value="SW">Südwest (von der Straße in die Halle, Standard)</option><option value="NE">Nordost</option></select>
   <label>Radius um Einzelpunkte wie „ABC" oder „Waschstraße" (Meter)</label><input id="sPt" type="number" min="3" max="100">
+  <label>Merkliste: Wagen, die immer in der Liste stehen sollen (eine Zeile je Wagen: Nummer | Info). Wagen ohne Daten erscheinen als „Nicht in Schnittstelle"</label><textarea id="sWatch" rows="6" style="font:13px/1.45 ui-monospace,Consolas,monospace"></textarea>
   <label>Toleranz quer zur Reihe (Meter, GPS ungenau → größer = mehr Strang-Bereiche)</label><input id="sTol" type="number" min="0.5" max="10" step="0.5">
   <label>Strang-Punkte, eine pro Zeile: {"strang":"18","lat":51.18,"lon":6.45}. Optional <b>"achse":"NS"</b> = Reihe ist entlang des Breitengrads (51.xxxx) frei verschiebbar, <b>"achse":"EW"</b> = entlang des Längengrads (6.xxxx), <b>"winkel":35</b> = beliebige Richtung der Reihe in Grad (0 = Nord, 90 = Ost, im Uhrzeigersinn; z. B. schräg wie der Carport). Ohne Angabe: Reihe senkrecht zur Punktlinie.</label>
   <textarea id="sAnch" rows="16" spellcheck="false"></textarea>
@@ -110,6 +140,14 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:.78rem;background:var(--
   </div>
 </dialog>
 
+<dialog id="dSeek">
+  <h3 style="margin-top:0">Sucher</h3>
+  <p class="mut" style="font-size:.85rem;margin:.2rem 0 .6rem">Durchsucht alle Einträge unter dem Pfad (Schlüssel und alle Werte, auch Kennzeichen oder Fahrzeugnummer in den Rohdaten) und die übergeordnete Ebene, soweit die Datenbank sie freigibt.</p>
+  <div style="display:flex;gap:.5rem"><input id="seekQ" placeholder="z. B. 1601" inputmode="search"><button id="seekGo" class="on">Suchen</button></div>
+  <div style="display:flex;gap:.5rem;margin-top:.5rem"><button id="seekWatch">Alle Wagen der Merkliste</button></div>
+  <pre id="seekOut" style="margin-top:.8rem">Noch nichts gesucht.</pre>
+  <div class="row"><button id="seekClose">Schließen</button></div>
+</dialog>
 <dialog id="dDet">
   <h3 style="margin-top:0" id="dTitle"></h3>
   <pre id="dJson"></pre>
@@ -119,9 +157,31 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:.78rem;background:var(--
 <script>
 (()=>{
 const LS='betriebshofliste.v1';
-const DEF={dbUrl:'https://fahrgastzahlen-default-rtdb.europe-west1.firebasedatabase.app',path:'',kursKey:'',dienstKey:'',rad:250,len:50,side:'SW',pt:15,every:120,stopKey:'',map:'google',mapTpl:'',tol:2,anchors:[],marks:[],anchorsInit:0,known:{}};
+const DEF={dbUrl:'https://fahrgastzahlen-default-rtdb.europe-west1.firebasedatabase.app',path:'',kursKey:'',dienstKey:'',rad:250,len:50,side:'SW',pt:15,every:120,histUrl:'https://raw.githubusercontent.com/spottingmg/btf/data/fahrzeuge.json',stopKey:'',map:'google',mapTpl:'',tol:2,anchors:[],marks:[],anchorsInit:0,known:{}};
 const DEFAULT_ANCHORS=[[18,51.183880,6.450556],[19,51.183902,6.450533],[20,51.183935,6.450496],[21,51.183963,6.450465],[22,51.184001,6.450433],[23,51.184022,6.450415],[24,51.184056,6.450378],[25,51.184086,6.450358],[26,51.184125,6.450318],[27,51.184150,6.450304],[28,51.184184,6.450260],[29,51.184219,6.450236],[30,51.184277,6.450187],[31,51.184304,6.450151],[32,51.184342,6.450111],[33,51.184372,6.450091],[34,51.184401,6.450057],[35,51.184113,6.449165],[36,51.184138,6.449150],['ABC',51.184093,6.451131],['Waschstraße',51.184607,6.4498481]].map(a=>({strand:String(a[0]),lat:a[1],lon:a[2]}));
+const WATCH_DEF=`1601 | MG-QS 1601 · Solaris Urbino IV 12
+1602 | MG-QS 1602 · Solaris Urbino IV 12
+1603 | MG-QS 1603 · Solaris Urbino IV 12
+1604 | MG-QS 1604 · Solaris Urbino IV 12
+1605 | MG-QS 1605 · Solaris Urbino IV 12
+1606 | MG-QS 1606 · Solaris Urbino IV 12
+1607 | MG-QS 1607 · Solaris Urbino IV 12
+1608 | MG-QS 1608 · Solaris Urbino IV 12
+1609 | MG-QS 1609 · Solaris Urbino IV 12
+1610 | MG-QS 1610 · Solaris Urbino IV 12
+1611 | MG-QS 1611 · Solaris Urbino IV 12
+1661 | MG-QG 1661 · Solaris Urbino IV 18
+1662 | MG-QG 1662 · Solaris Urbino IV 18
+1663 | MG-QG 1663 · Solaris Urbino IV 18
+1664 | MG-QG 1664 · Solaris Urbino IV 18
+1665 | MG-QG 1665 · Solaris Urbino IV 18
+1666 | MG-QG 1666 · Solaris Urbino IV 18
+1667 | MG-QG 1667 · Solaris Urbino IV 18
+1668 | MG-QG 1668 · Solaris Urbino IV 18`;
 let S=load();
+if(S.watchV!==1){S.watchTxt=WATCH_DEF;S.watchV=1}
+if(!S.path)S.path='livegeomatching/busses';
+function watchList(){return String(S.watchTxt||'').split(/\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const m=l.match(/^(\S+)\s*[|:;,\t ]?\s*(.*)$/);return m?{w:m[1],info:m[2].trim()}:null}).filter(Boolean)}
 if(S.anchorsInit!==2){S.anchors=DEFAULT_ANCHORS.map(a=>({...a}));S.anchorsInit=2;}
 if(!Array.isArray(S.marks))S.marks=[];
 if(S.lenV!==2){S.len=50;S.lenV=2}   // Reihenlänge 50 m (ersetzt früheren Standard 80)
@@ -138,7 +198,7 @@ function connect(){
   if(es){es.close();es=null}
   tree={};lastIngest=0;
   if(!S.dbUrl){notice('Bitte in den Einstellungen die Datenbank-URL eintragen.');return}
-  if(!S.path){notice('Der Pfad der Fahrzeuge ist noch nicht gesetzt. Öffne die <b>Einstellungen</b> und klicke bei „Pfad" auf <b>Suchen</b>. Wird der Zugriff nicht angenommen, versuche <i>livegeomatching/busses/<i/>');setConn(false,'kein Pfad');return}
+  if(!S.path){notice('Der Pfad der Fahrzeuge ist noch nicht gesetzt. Öffne die <b>Einstellungen</b> und klicke bei „Pfad" auf <b>Suchen</b>.');setConn(false,'kein Pfad');return}
   const url=S.dbUrl.replace(/\/$/,'')+'/'+S.path.replace(/^\/|\/$/g,'')+'.json';
   setConn(false,'verbinde …');
   es=new EventSource(url);
@@ -167,15 +227,30 @@ let lastIngest=0;
 const now=()=>Date.now();
 function dist(a,b,c,d){const R=6371000,t=x=>x*Math.PI/180,dl=t(c-a),dn=t(d-b);const h=Math.sin(dl/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 function dig(o,path){return path.split('.').reduce((x,k)=>x==null?undefined:x[k],o)}
+let HIST=null,histInfo='';
+async function loadHist(){
+  if(!S.histUrl){HIST=null;histInfo='';showStand();return}
+  try{
+    const r=await fetch(S.histUrl+(S.histUrl.includes('?')?'&':'?')+'t='+Math.floor(Date.now()/120000),{cache:'no-store'});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    HIST=j&&j.vehicles?j:null;
+    histInfo=HIST?`Verlauf ${HIST.updated?new Date(HIST.updated).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'geladen'} · ${Object.keys(HIST.vehicles).length} Wagen`:'Verlauf leer';
+  }catch(e){HIST=null;histInfo='Verlauf nicht erreichbar'}
+  ingest();
+}
 function ingest(){
   const t=now(), ids=new Set();
   lastIngest=t;
   rawById={};
-  for(const id of Object.keys(tree)){
-    const v=tree[id]; if(!v||typeof v!=='object')continue;
+  /* Verarbeitet einen Datensatz. live=false: gespeicherter Stand aus dem Verlauf (Wagen ist nicht mehr in der Datenbank) */
+  const take=(id,v,tt,live)=>{
+    const t=tt;
     const g=v.geomatching||{}, r=v.raw||{};
     const wagen=String(r.vehicle??g.vehicle??id);
-    ids.add(wagen); rawById[wagen]=v;
+    if(live){ids.add(wagen)}
+    else{const o=S.known[wagen];if(ids.has(wagen)||(o&&(o.seen||0)>=tt))return}
+    rawById[wagen]=v;
     const lat=Number(r.lat??g.lat), lon=Number(r.lon??g.lon);
     const ts=Date.parse(r.send_time||r.time)||t;
     const visible=!!(g.IS_GEORTET&&g.IS_ONLINE&&!r.exclusion_zone&&isFinite(lat)&&isFinite(lon));
@@ -186,7 +261,7 @@ function ingest(){
       next:g.NEXT_ORT_REF_ORT_NAME??'',
       kurs:pickKurs(v,g,r),
       dienst:S.dienstKey?fmt(dig(v,S.dienstKey)):'',
-      excl:!!r.exclusion_zone, visible, inDb:true, seen:t,
+      excl:!!r.exclusion_zone, visible, inDb:live, seen:t,
       ts
     });
     if(isFinite(lat)&&isFinite(lon)&&lat&&lon){k.lat=lat;k.lon=lon}
@@ -201,17 +276,20 @@ function ingest(){
     const sid=r.stationid??g.stationid;                      // Haltestellennummer, 1:1 aus den Rohdaten
     if(sid!=null&&String(sid).trim()&&Number(sid)!==0)k.stationId=String(sid).trim();
     settle(k,t);
-  }
+  };
+  for(const id of Object.keys(tree)){const v=tree[id];if(v&&typeof v==='object')take(id,v,t,true)}
+  /* Verlauf vom Sammler: Wagen, die gerade nicht in der Datenbank stehen, mit ihrem letzten gespeicherten Stand */
+  if(HIST&&HIST.vehicles)for(const id of Object.keys(HIST.vehicles)){const e=HIST.vehicles[id];if(e&&e.v&&typeof e.v==='object'&&e.seen)take(id,e.v,e.seen,false)}
   for(const w in S.known){
     const k=S.known[w];
     if(!ids.has(w)){k.inDb=false; k.visible=false}
-    if(t-(k.seen||0)>36*3600e3){delete S.known[w];continue}
     trackHof(k,t);
+    if(t-(k.seen||0)>365*24*3600e3){delete S.known[w];continue}   // jeder einmal gesehene Wagen bleibt mit letztem Stand ein Jahr erhalten
   }
   save(); render(); showStand();
 }
 function showStand(){
-  $('stand').textContent=lastIngest?'Stand '+new Date(lastIngest).toLocaleTimeString('de-DE')+' · alle '+S.every+' s':'';
+  $('stand').textContent=(lastIngest?'Stand '+new Date(lastIngest).toLocaleTimeString('de-DE')+' · alle '+S.every+' s':'')+(histInfo?(lastIngest?' · ':'')+histInfo:'');
 }
 /* Hofposition: beim Ankommen festhalten, solange der Wagen im Hof ist behalten, beim Ausfahren verwerfen */
 function trackHof(k,t){
@@ -221,7 +299,7 @@ function trackHof(k,t){
   }
   const st=derive(k).status;
   if(st==='hof'){
-    if(!k.inHof){k.inHof=true;k.hofSince=t}
+    if(!k.inHof){k.inHof=true;k.hofSince=k.inDb?t:(k.seen||t)}
     if(k.inDb&&k.lat!=null){k.hofLat=k.lat;k.hofLon=k.lon;k.hofT=k.ts}   // letzte gemeldete Position im Hof
     if(k.hofLat==null&&k.lat!=null){k.hofLat=k.lat;k.hofLon=k.lon;k.hofT=k.ts}
   }
@@ -353,7 +431,7 @@ function mapUrl(p){
   if(S.map==='custom'&&S.mapTpl)return S.mapTpl.replace(/\{lat\}/g,la).replace(/\{lon\}/g,lo);
   return `https://www.google.com/maps/search/?api=1&query=${la},${lo}`;
 }
-const ST={fahrt:'Unterwegs',hof:'Im Betriebshof',off:'Kein Signal'};
+const ST={fahrt:'Unterwegs',hof:'Im Betriebshof',off:'Kein Signal',miss:'Nicht in Schnittstelle'};
 function ago(ts){if(!ts)return'';const s=Math.max(0,Math.round((now()-ts)/1000));if(s<60)return s+' s';if(s<3600)return Math.round(s/60)+' min';return Math.round(s/3600)+' h'}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function buildRows(){
@@ -366,6 +444,8 @@ function buildRows(){
     if(r.status==='hof'&&r.loc&&r.loc.cl>=0){(grp[r.loc.cl+'/'+r.loc.strand]=grp[r.loc.cl+'/'+r.loc.strand]||[]).push(r)}
   });
   Object.values(grp).forEach(g=>{g.sort((x,y)=>Math.abs(x.loc.v)-Math.abs(y.loc.v));g.forEach((r,i)=>{r.platz=i+1;r.ort+=` · ${i+1}. Wagen`;})});
+  /* Merkliste: Wagen, die noch nie in der Schnittstelle vorkamen */
+  watchList().forEach(w=>{if(!S.known[w.w])rows.push({k:{wagen:w.w,lineStable:'',kurs:'',dienst:'',dest:w.info,side:'',ts:0},status:'miss',ort:'Nicht in der Schnittstelle',coord:'',loc:null})});
   rows.forEach(r=>{if(r.status==='hof'&&r.k.hofSince)r.ort+=' · seit '+new Date(r.k.hofSince).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})});
   return rows;
 }
@@ -377,21 +457,23 @@ function render(){
   rows.sort((a,b)=>{const x=val(a),y=val(b);return (x>y?1:x<y?-1:0)*sortDir});
   $('tb').innerHTML=rows.map(r=>`<tr data-w="${esc(r.k.wagen)}" title="Doppelklick: Rohdaten">
     <td class="n">${esc(r.k.wagen)}</td><td class="n">${esc(r.k.lineStable)}</td><td>${esc(r.k.kurs)}</td><td>${esc(r.k.dienst)}</td>
-    <td><span class="tag ${r.status}">${ST[r.status]}</span></td><td class="wrap">${r.status==='hof'?esc(r.ort)+(r.coord?'<br><span class="mut">'+esc(r.coord)+'</span>':''):esc(r.coord)}</td><td class="stop">${stopHtml(r.k)}</td><td class="wrap mut">${esc(r.k.dest)}${r.k.side?'<br><span class="side">'+esc(r.k.side)+'</span>':''}</td>
+    <td><span class="tag ${r.status}">${ST[r.status]}</span></td><td class="wrap">${r.status==='hof'||r.status==='miss'?esc(r.ort)+(r.coord?'<br><span class="mut">'+esc(r.coord)+'</span>':''):esc(r.coord)}</td><td class="stop">${stopHtml(r.k)}</td><td class="wrap mut">${esc(r.k.dest)}${r.k.side?'<br><span class="side">'+esc(r.k.side)+'</span>':''}</td>
     <td class="mut">${ago(r.k.ts)}</td>
-    <td>${posOf(r.k)?`<a href="${mapUrl(posOf(r.k))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Karte</a>`:''}</td></tr>`).join('');
-  const total=Object.keys(S.known).length;
-  $('cnt').textContent=total?`${rows.length} von ${total} Wagen`:'';
+    <td>${posOf(r.k)?`<a href="${mapUrl(posOf(r.k))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Karte</a>`:''}<a href="#" class="raw" style="margin-left:.6rem">Roh</a></td></tr>`).join('');
+  const total=Object.keys(S.known).length,all=buildRows().length;
+  $('cnt').textContent=all?`${rows.length} von ${all} Wagen`:'';
   if(!total&&es&&$('conn').classList.contains('on'))notice('Verbunden, aber unter diesem Pfad liegen keine Fahrzeuge. Pfad in den Einstellungen prüfen.');
 }
-$('tb').addEventListener('dblclick',e=>{
+function showRaw(e){
   const tr=e.target.closest('tr[data-w]');
-  if(!tr||e.target.closest('a'))return;
+  if(!tr)return;
   const w=tr.dataset.w;
   $('dTitle').textContent='Wagen '+w+' – Rohdaten';
   $('dJson').textContent=JSON.stringify(rawById[w]??{hinweis:'Wagen ist aktuell nicht in der Datenbank. Letzter bekannter Stand:',...S.known[w]},null,2);
   $('dDet').showModal();
-});
+}
+$('tb').addEventListener('dblclick',e=>{if(!e.target.closest('a'))showRaw(e)});
+$('tb').addEventListener('click',e=>{if(e.target.closest('a.raw')){e.preventDefault();showRaw(e)}});
 document.querySelectorAll('.bar button').forEach(b=>b.onclick=()=>{filter=b.dataset.f;document.querySelectorAll('.bar button').forEach(x=>x.classList.toggle('on',x===b));render()});
 document.querySelectorAll('th[data-s]').forEach(th=>th.onclick=()=>{const s=th.dataset.s;if(sortKey===s)sortDir*=-1;else{sortKey=s;sortDir=1}render()});
 $('q').oninput=render;
@@ -475,19 +557,19 @@ function fieldOptions(sel,cur){
 }
 $('bSet').onclick=()=>{
   $('sUrl').value=S.dbUrl;$('sPath').value=S.path;$('sRad').value=S.rad;
-  $('sLen').value=S.len;$('sSide').value=S.side||'SW';$('sPt').value=S.pt||15;$('sEvery').value=S.every||120;$('sTol').value=S.tol;$('sAnch').value=S.anchors.map(a=>JSON.stringify({strang:a.strand,lat:a.lat,lon:a.lon,...(a.achse?{achse:a.achse}:{})})).join(',\n');
-  fieldOptions($('sKurs'),S.kursKey);fieldOptions($('sDienst'),S.dienstKey);fieldOptions($('sStop'),S.stopKey);$('sMap').value=S.map||'google';$('sMapTpl').value=S.mapTpl||'';
+  $('sLen').value=S.len;$('sSide').value=S.side||'SW';$('sPt').value=S.pt||15;$('sEvery').value=S.every||120;$('sTol').value=S.tol;$('sWatch').value=S.watchTxt||'';$('sAnch').value=S.anchors.map(a=>JSON.stringify({strang:a.strand,lat:a.lat,lon:a.lon,...(a.achse?{achse:a.achse}:{})})).join(',\n');
+  fieldOptions($('sKurs'),S.kursKey);fieldOptions($('sDienst'),S.dienstKey);fieldOptions($('sStop'),S.stopKey);$('sMap').value=S.map||'google';$('sMapTpl').value=S.mapTpl||'';$('sHist').value=S.histUrl||'';
   $('found').textContent='';$('dSet').showModal();
 };
 $('bCancel').onclick=()=>$('dSet').close();
 $('bClear').onclick=()=>{if(confirm('Alle gemerkten Wagen löschen?')){S.known={};save();render()}};
 $('bSave').onclick=()=>{
   S.dbUrl=$('sUrl').value.trim();S.path=$('sPath').value.trim();
-  S.kursKey=$('sKurs').value;S.dienstKey=$('sDienst').value;S.stopKey=$('sStop').value;S.map=$('sMap').value;S.mapTpl=$('sMapTpl').value.trim();S.rad=+$('sRad').value||250;
-  S.len=+$('sLen').value||50;S.side=$('sSide').value;S.pt=+$('sPt').value||15;S.every=Math.max(5,+$('sEvery').value||120);S.tol=+$('sTol').value||2;
+  S.kursKey=$('sKurs').value;S.dienstKey=$('sDienst').value;S.stopKey=$('sStop').value;S.map=$('sMap').value;S.mapTpl=$('sMapTpl').value.trim();S.histUrl=$('sHist').value.trim();S.rad=+$('sRad').value||250;
+  S.len=+$('sLen').value||50;S.side=$('sSide').value;S.pt=+$('sPt').value||15;S.every=Math.max(5,+$('sEvery').value||120);S.tol=+$('sTol').value||2;S.watchTxt=$('sWatch').value;
   const parsed=parseAnchors($('sAnch').value);
   if(parsed)S.anchors=parsed;else alert('Strang-Punkte: nichts Lesbares gefunden – bisherige Punkte bleiben.');
-  geo=null;save();render();autoSave();$('dSet').close();connect();
+  geo=null;save();render();autoSave();$('dSet').close();connect();loadHist();
 };
 /* tolerant: akzeptiert strang/strand, Komma am Ende, Leerzeichen, überzählige Klammern */
 function axisOf(o){const r=axisRaw(o);return r===0?'NS':r===90?'EW':r}
@@ -521,8 +603,60 @@ $('bFind').onclick=async()=>{
   }catch(e){f.textContent='Nicht erreichbar: '+e.message}
 };
 
-connect();render();
+/* ---------- Sucher: durchsucht die ganze Datenbank unter dem Pfad ---------- */
+async function seekFetch(path,shallow){
+  const u=S.dbUrl.replace(/\/$/,'')+'/'+path.replace(/^\/|\/$/g,'')+'.json'+(shallow?'?shallow=true':'');
+  const r=await fetch(u);const j=await r.json().catch(()=>null);
+  if(!r.ok)throw new Error((j&&j.error)||('HTTP '+r.status));return j;
+}
+/* Treffer nur, wenn die Zahl für sich steht (nicht Teil einer längeren Zahl oder Koordinate wie 51.1601) */
+function seekHit(str,terms){
+  const x=String(str).toLowerCase();
+  return terms.some(t=>{const e=t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return new RegExp('(^|[^\\d.,])'+e+'($|[^\\d.,]|[.,](?!\\d))').test(x)});
+}
+function seekWalk(node,path,terms,hits){
+  if(node&&typeof node==='object'){
+    for(const k of Object.keys(node)){
+      seekWalk(node[k],path+'/'+k,terms,hits);
+    }
+  }else if(node!=null&&seekHit(node,terms))hits.push({p:path,v:node});
+}
+async function seek(terms){
+  const out=$('seekOut');out.textContent='Suche läuft …';
+  const base=S.path.replace(/^\/|\/$/g,'');
+  let txt='';
+  try{
+    const tree=await seekFetch(base,false);
+    const keys=tree&&typeof tree==='object'?Object.keys(tree):[];
+    txt+=`Unter „${base}“ liegen ${keys.length} Einträge.\n`;
+    const T=terms.map(t=>t.toLowerCase());
+    const hits=[];
+    /* Treffer je Eintrag sammeln (Schlüssel oder irgendein Wert) */
+    const per={};
+    for(const k of keys){const h=[];if(seekHit(k,T))h.push({p:'(Schlüssel)',v:k});seekWalk(tree[k],'',T,h);if(h.length)per[k]=h}
+    const ks=Object.keys(per);
+    if(!ks.length)txt+=`\nKein Treffer für ${terms.join(', ')} in den Einträgen.\n`;
+    for(const k of ks.slice(0,40)){
+      txt+=`\nEintrag „${k}“${S.known[k]?' (steht in der Liste)':''}:\n`+per[k].slice(0,6).map(h=>`  ${h.p} = ${JSON.stringify(h.v)}`).join('\n')+'\n';
+    }
+    if(ks.length>40)txt+=`\n… und ${ks.length-40} weitere Einträge.\n`;
+  }catch(e){txt+=`Fehler beim Lesen von „${base}“: ${e.message}\n`}
+  /* übergeordnete Ebene (nur Schlüssel), falls erlaubt */
+  const parent=S.path.replace(/^\/|\/$/g,'').split('/').slice(0,-1).join('/');
+  if(parent){
+    try{const j=await seekFetch(parent,true);txt+=`\nÜbergeordnet „${parent}“ enthält: ${Object.keys(j||{}).join(', ')||'(leer)'}\n`}
+    catch(e){txt+=`\nÜbergeordnet „${parent}“ ist nicht lesbar (${e.message}).\n`}
+  }
+  out.textContent=txt;
+}
+$('bSeek').onclick=()=>{$('dSeek').showModal()};
+$('seekClose').onclick=()=>$('dSeek').close();
+$('seekGo').onclick=()=>{const t=$('seekQ').value.split(/[\s,;]+/).filter(Boolean);if(t.length)seek(t)};
+$('seekQ').addEventListener('keydown',e=>{if(e.key==='Enter')$('seekGo').click()});
+$('seekWatch').onclick=()=>{const t=watchList().map(w=>w.w);$('seekQ').value=t.join(' ');if(t.length)seek(t)};
+connect();render();loadHist();setInterval(loadHist,10*60*1000);
 })();
+
 </script>
 </body>
 </html>
