@@ -9,7 +9,7 @@ const PATH = (process.env.DB_PATH || 'livegeomatching/busses').replace(/^\/|\/$/
 const MINUTES = Number(process.env.MINUTES || 28);       // Laufzeit dieses Durchgangs
 const EVERY = Number(process.env.EVERY_SECONDS || 15);   // Abfrage-Takt
 const PUSH_EVERY = Number(process.env.PUSH_MINUTES || 5);// zwischendurch speichern
-const KEEP_DAYS = Number(process.env.KEEP_DAYS || 400);  // so lange bleibt ein Wagen gespeichert
+const KEEP_DAYS = Number(process.env.KEEP_DAYS || 0);    // 0 = ein Wagen bleibt für immer gespeichert
 const DIR = process.env.DATA_DIR || 'data';
 const FILE = `${DIR}/fahrzeuge.json`;
 const REPO = process.env.GITHUB_REPOSITORY, TOKEN = process.env.GITHUB_TOKEN;
@@ -42,7 +42,7 @@ async function poll() {
       store.vehicles[wagen] = { seen: now, v };
       n++;
     }
-    for (const w of Object.keys(store.vehicles)) {
+    if (KEEP_DAYS > 0) for (const w of Object.keys(store.vehicles)) {
       if (now - (store.vehicles[w].seen || 0) > KEEP_DAYS * 864e5) delete store.vehicles[w];
     }
     if (n) dirty = true;
