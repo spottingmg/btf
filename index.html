@@ -115,6 +115,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:.78rem;background:var(--
   <h3 style="margin-top:0">Einstellungen</h3>
   <label>Feld für Letzter Halt (optional – sonst wird er aus dem Wechsel des nächsten Halts abgeleitet)</label><select id="sStop"></select>
   <label>Karte öffnen mit</label><select id="sMap"><option value="google">Google Maps</option><option value="osm">OpenStreetMap</option><option value="custom">Eigene URL (z. B. Livekarte)</option></select>
+  <label>Ausgeblendete Wagen, z. B. verkaufte (Nummern, durch Leerzeichen oder Komma getrennt). Alle anderen Wagen bleiben für immer mit ihrer letzten bekannten Position in der Liste</label><textarea id="sHide" rows="2" style="font:13px/1.45 ui-monospace,Consolas,monospace"></textarea>
   <label>Verlauf-Datei vom Sammler (leer = ohne Verlauf)</label><input id="sHist" placeholder="https://raw.githubusercontent.com/…/fahrzeuge.json">
   <label>Eigene Karten-URL – {lat} und {lon} werden ersetzt</label><input id="sMapTpl" placeholder="https://…?lat={lat}&amp;lon={lon}">
   <label>Aktualisierung der Liste (Sekunden)</label><input id="sEvery" type="number" min="5" max="3600">
@@ -284,7 +285,7 @@ function ingest(){
     const k=S.known[w];
     if(!ids.has(w)){k.inDb=false; k.visible=false}
     trackHof(k,t);
-    if(t-(k.seen||0)>365*24*3600e3){delete S.known[w];continue}   // jeder einmal gesehene Wagen bleibt mit letztem Stand ein Jahr erhalten
+    
   }
   save(); render(); showStand();
 }
@@ -435,7 +436,8 @@ const ST={fahrt:'Unterwegs',hof:'Im Betriebshof',off:'Kein Signal',miss:'Nicht i
 function ago(ts){if(!ts)return'';const s=Math.max(0,Math.round((now()-ts)/1000));if(s<60)return s+' s';if(s<3600)return Math.round(s/60)+' min';return Math.round(s/3600)+' h'}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function buildRows(){
-  const rows=Object.values(S.known).map(k=>({k,...derive(k)}));
+  const hid=new Set(String(S.hideTxt||'').split(/[\s,;]+/).filter(Boolean));
+  const rows=Object.values(S.known).filter(k=>!hid.has(String(k.wagen))).map(k=>({k,...derive(k)}));
   const grp={};
   rows.forEach(r=>{
     r.strangLabel=r.status==='hof'&&r.loc?r.loc.label:null;
@@ -445,7 +447,7 @@ function buildRows(){
   });
   Object.values(grp).forEach(g=>{g.sort((x,y)=>Math.abs(x.loc.v)-Math.abs(y.loc.v));g.forEach((r,i)=>{r.platz=i+1;r.ort+=` · ${i+1}. Wagen`;})});
   /* Merkliste: Wagen, die noch nie in der Schnittstelle vorkamen */
-  watchList().forEach(w=>{if(!S.known[w.w])rows.push({k:{wagen:w.w,lineStable:'',kurs:'',dienst:'',dest:w.info,side:'',ts:0},status:'miss',ort:'Nicht in der Schnittstelle',coord:'',loc:null})});
+  watchList().forEach(w=>{if(!S.known[w.w]&&!hid.has(w.w))rows.push({k:{wagen:w.w,lineStable:'',kurs:'',dienst:'',dest:w.info,side:'',ts:0},status:'miss',ort:'Nicht in der Schnittstelle',coord:'',loc:null})});
   rows.forEach(r=>{if(r.status==='hof'&&r.k.hofSince)r.ort+=' · seit '+new Date(r.k.hofSince).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})});
   return rows;
 }
@@ -558,14 +560,14 @@ function fieldOptions(sel,cur){
 $('bSet').onclick=()=>{
   $('sUrl').value=S.dbUrl;$('sPath').value=S.path;$('sRad').value=S.rad;
   $('sLen').value=S.len;$('sSide').value=S.side||'SW';$('sPt').value=S.pt||15;$('sEvery').value=S.every||120;$('sTol').value=S.tol;$('sWatch').value=S.watchTxt||'';$('sAnch').value=S.anchors.map(a=>JSON.stringify({strang:a.strand,lat:a.lat,lon:a.lon,...(a.achse?{achse:a.achse}:{})})).join(',\n');
-  fieldOptions($('sKurs'),S.kursKey);fieldOptions($('sDienst'),S.dienstKey);fieldOptions($('sStop'),S.stopKey);$('sMap').value=S.map||'google';$('sMapTpl').value=S.mapTpl||'';$('sHist').value=S.histUrl||'';
+  fieldOptions($('sKurs'),S.kursKey);fieldOptions($('sDienst'),S.dienstKey);fieldOptions($('sStop'),S.stopKey);$('sMap').value=S.map||'google';$('sMapTpl').value=S.mapTpl||'';$('sHist').value=S.histUrl||'';$('sHide').value=S.hideTxt||'';
   $('found').textContent='';$('dSet').showModal();
 };
 $('bCancel').onclick=()=>$('dSet').close();
 $('bClear').onclick=()=>{if(confirm('Alle gemerkten Wagen löschen?')){S.known={};save();render()}};
 $('bSave').onclick=()=>{
   S.dbUrl=$('sUrl').value.trim();S.path=$('sPath').value.trim();
-  S.kursKey=$('sKurs').value;S.dienstKey=$('sDienst').value;S.stopKey=$('sStop').value;S.map=$('sMap').value;S.mapTpl=$('sMapTpl').value.trim();S.histUrl=$('sHist').value.trim();S.rad=+$('sRad').value||250;
+  S.kursKey=$('sKurs').value;S.dienstKey=$('sDienst').value;S.stopKey=$('sStop').value;S.map=$('sMap').value;S.mapTpl=$('sMapTpl').value.trim();S.histUrl=$('sHist').value.trim();S.hideTxt=$('sHide').value.trim();S.rad=+$('sRad').value||250;
   S.len=+$('sLen').value||50;S.side=$('sSide').value;S.pt=+$('sPt').value||15;S.every=Math.max(5,+$('sEvery').value||120);S.tol=+$('sTol').value||2;S.watchTxt=$('sWatch').value;
   const parsed=parseAnchors($('sAnch').value);
   if(parsed)S.anchors=parsed;else alert('Strang-Punkte: nichts Lesbares gefunden – bisherige Punkte bleiben.');
